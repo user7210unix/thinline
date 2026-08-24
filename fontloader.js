@@ -42,15 +42,22 @@ var FontLoader = (function () {
    * ----------------------------------------------------------- */
   var FALLBACK = {
     sans: ["Plus Jakarta Sans", "Inter", "Manrope", "Work Sans", "Space Grotesk",
-           "Sora", "Outfit", "DM Sans", "Karla", "Rubik", "Lexend", "Figtree"],
+           "Sora", "Outfit", "DM Sans", "Karla", "Rubik", "Lexend", "Figtree",
+           "Mulish", "Urbanist", "Hanken Grotesk", "Onest", "Public Sans",
+           "Be Vietnam Pro", "Plus Jakarta Display", "Schibsted Grotesk", "Albert Sans"],
     serif: ["Source Serif 4", "Lora", "Playfair Display", "Merriweather", "Newsreader",
-            "Bitter", "Cormorant Garamond", "Spectral", "Crimson Pro", "Libre Baskerville"],
+            "Bitter", "Cormorant Garamond", "Spectral", "Crimson Pro", "Libre Baskerville",
+            "Fraunces", "Zilla Slab", "Petrona", "Domine", "Bree Serif",
+            "Alegreya", "Vollkorn", "PT Serif", "Noto Serif", "Literata"],
     mono: ["JetBrains Mono", "IBM Plex Mono", "Space Mono", "Fira Code", "Roboto Mono",
-           "Courier Prime", "Source Code Pro", "Red Hat Mono", "Fragment Mono"],
+           "Courier Prime", "Source Code Pro", "Red Hat Mono", "Fragment Mono",
+           "Ubuntu Mono", "Overpass Mono", "Azeret Mono", "Martian Mono", "DM Mono"],
     hand: ["Caveat", "Dancing Script", "Kalam", "Shadows Into Light", "Patrick Hand",
-           "Indie Flower", "Gochi Hand", "Reenie Beanie", "Homemade Apple"],
+           "Indie Flower", "Gochi Hand", "Reenie Beanie", "Homemade Apple",
+           "Sacramento", "Satisfy", "Pacifico", "Nanum Pen Script", "Neucha", "Marck Script"],
     display: ["Bungee", "Abril Fatface", "Righteous", "Passion One", "Alfa Slab One",
-              "Anton", "Bebas Neue", "Fjalla One", "Archivo Black"]
+              "Anton", "Bebas Neue", "Fjalla One", "Archivo Black",
+              "Staatliches", "Rammetto One", "Titan One", "Bowlby One", "Luckiest Guy"]
   };
 
   // system fonts need no network fetch at all
@@ -140,31 +147,34 @@ var FontLoader = (function () {
     var list = (pool && pool[category] && pool[category].length) ? pool[category] : FALLBACK[category];
     var start = page * PAGE_SIZE;
     var slice = list.slice(start, start + PAGE_SIZE);
-    if (slice.length < PAGE_SIZE) {
+    var noMore = start + PAGE_SIZE >= list.length;
+    if (slice.length < PAGE_SIZE && list.length) {
+      // pool smaller than one page - top up with non-duplicate
+      // fallback entries only, never wrapping back over what we
+      // already returned (that wraparound was the repeat bug)
       var fb = FALLBACK[category];
-      var i = 0;
-      while (slice.length < PAGE_SIZE) {
-        var cand = fb[(start + i) % fb.length];
-        if (slice.indexOf(cand) < 0) slice.push(cand);
-        i++;
-        if (i > fb.length * 2) break; // safety valve
+      for (var i = 0; i < fb.length && slice.length < PAGE_SIZE; i++) {
+        if (slice.indexOf(fb[i]) < 0) slice.push(fb[i]);
       }
+      noMore = true;
     }
-    return slice;
+    return { slice: slice, noMore: noMore };
   }
 
   function fetchPage(category, page, cb) {
-    if (category === "system") { cb(SYSTEM.map(function (s) { return s.family; })); return; }
+    if (category === "system") { cb(SYSTEM.map(function (s) { return s.family; }), true); return; }
 
     var entry = cacheRead();
 
     if (entry && cacheAge(entry) < CACHE_TTL) {
-      cb(serveFromPool(entry.data, category, page));
+      var r1 = serveFromPool(entry.data, category, page);
+      cb(r1.slice, r1.noMore);
       return;
     }
 
     if (entry && cacheAge(entry) < CACHE_STALE_OK) {
-      cb(serveFromPool(entry.data, category, page));
+      var r2 = serveFromPool(entry.data, category, page);
+      cb(r2.slice, r2.noMore);
       scrapeLive(function (fresh) { if (fresh) cacheWrite(fresh); });
       return;
     }
@@ -172,7 +182,8 @@ var FontLoader = (function () {
     scrapeLive(function (fresh) {
       var pool = fresh || (entry ? entry.data : null);
       if (pool) cacheWrite(pool);
-      cb(serveFromPool(pool, category, page));
+      var r3 = serveFromPool(pool, category, page);
+      cb(r3.slice, r3.noMore);
     });
   }
 

@@ -2,7 +2,7 @@
 
 A minimal, distraction-free reader for imageboards.
 
-**Live: [user7210unix.github.io/chanchan](https://user7210unix.github.io/chanchan/)**
+**Live: [user7210unix.github.io/chanchan](https://user7210unix.github.io/thinline/)**
 
 ![preview](assets/preview.png)
 

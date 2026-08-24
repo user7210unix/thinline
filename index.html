@@ -17,12 +17,6 @@
 
 <style type="text/css">
 
-/* ============================================================
-   COLOR TOKENS
-   These are overwritten at runtime by colorpalette.js. The
-   values here just match the default fallback palette so
-   there's no flash of unstyled color before JS runs.
-   ============================================================ */
 :root{
   --c-bg:#fffdf6;
   --c-bg-alt:#ffe0e9;
@@ -41,13 +35,11 @@
   --sp-2:8px;
   --sp-3:14px;
   --sp-4:22px;
+
+  --ui-radius:0px;
+  --ui-shadow:none;
 }
 
-/* ============================================================
-   RESET / BASE  -  mobile-first: unprefixed rules target small
-   screens, min-width queries further down layer on enhancements
-   for wider viewports (SELFHTML mobile-first approach)
-   ============================================================ */
 *{ box-sizing:border-box; }
 html{ -webkit-text-size-adjust:100%; }
 body{
@@ -69,13 +61,14 @@ button, input, select{
   color:var(--c-fg);
   background:var(--c-bg);
   border:1px solid var(--c-border);
-  border-radius:0;
+  border-radius:var(--ui-radius);
   padding:6px 9px;
   outline:none;
 }
 button{
   cursor:pointer;
   background:var(--c-bg-alt);
+  box-shadow:var(--ui-shadow);
   transition:background .1s ease, opacity .1s ease;
 }
 button:hover{ background:var(--c-accent); }
@@ -83,9 +76,7 @@ button:active{ opacity:.8; }
 input:focus, select:focus, button:focus{ border-color:var(--c-accent); }
 ::selection{ background:var(--c-accent); color:var(--c-fg); }
 
-/* ============================================================
-   LAYOUT SHELL
-   ============================================================ */
+
 #shell{
   max-width:860px;
   margin:0 auto;
@@ -165,21 +156,6 @@ input:focus, select:focus, button:focus{ border-color:var(--c-accent); }
 .ac-item span{ color:var(--c-fg-muted); margin-left:4px; }
 .ac-item:hover{ background:var(--c-bg-alt); }
 
-/* ---- filters ---- */
-#filters{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-  align-items:center;
-  font-size:12px;
-  margin-bottom:var(--sp-3);
-  color:var(--c-fg-muted);
-}
-#filters input{ width:104px; }
-
-/* ============================================================
-   SETTINGS PANEL
-   ============================================================ */
 #settings{
   position:fixed;
   top:0; right:0;
@@ -258,12 +234,17 @@ input[type=range]::-moz-range-thumb{
 .swatch-row{ display:inline-flex; }
 .swatch-row i{
   display:inline-block;
-  width:14px; height:14px;
+  width:16px; height:16px;
   border:1px solid rgba(0,0,0,.15);
+  border-radius:var(--ui-radius);
 }
 .combo-menu{
-  margin-top:6px;
+  margin-top:8px;
   border:1px solid var(--c-border);
+  border-radius:var(--ui-radius);
+  box-shadow:var(--ui-shadow);
+  background:var(--c-bg);
+  overflow:hidden;
 }
 .combo-menu.hidden{ display:none; }
 .combo-tabs{ display:flex; flex-wrap:wrap; }
@@ -271,21 +252,25 @@ input[type=range]::-moz-range-thumb{
   flex:1 1 auto;
   min-width:44px;
   border:none;
-  border-bottom:1px solid var(--c-border);
+  border-bottom:2px solid var(--c-border);
   background:var(--c-bg);
   font-size:11px;
-  padding:6px 4px;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+  padding:8px 4px;
 }
-.combo-tabs button.active{ background:var(--c-accent); }
+.combo-tabs button.active{ background:var(--c-bg-alt); border-bottom-color:var(--c-accent); color:var(--c-fg); }
 .palette-list{
-  max-height:260px;
+  max-height:280px;
   overflow-y:auto;
 }
 .palette-row{
   display:flex;
   cursor:pointer;
-  height:38px;
+  height:44px;
+  border-bottom:1px solid var(--c-border);
 }
+.palette-row:last-child{ border-bottom:none; }
 .palette-row:hover{ outline:2px solid var(--c-accent); outline-offset:-2px; }
 .palette-row.selected{ outline:2px solid var(--c-fg); outline-offset:-2px; }
 .palette-row i{ flex:1; display:block; }
@@ -293,39 +278,51 @@ input[type=range]::-moz-range-thumb{
   text-align:center;
   font-size:11px;
   color:var(--c-fg-muted);
-  padding:8px;
+  padding:9px;
+  letter-spacing:.03em;
 }
 .combo-loading.hidden{ display:none; }
 
 .font-list{
-  max-height:260px;
+  max-height:300px;
   overflow-y:auto;
 }
 .font-row{
-  padding:9px 10px;
+  padding:12px 12px;
   cursor:pointer;
-  font-size:16px;
   border-bottom:1px solid var(--c-border);
 }
 .font-row:last-child{ border-bottom:none; }
-.font-row span{
+.font-row .font-name{
   display:block;
-  font-size:10px;
-  font-family:var(--ui-font);
+  font-size:21px;
+  line-height:1.2;
+  color:var(--c-fg);
+}
+.font-row .font-sample{
+  display:block;
+  font-size:13px;
   color:var(--c-fg-muted);
-  margin-top:2px;
+  margin-top:4px;
 }
 .font-row:hover{ background:var(--c-bg-alt); }
 .font-row.selected{ background:var(--c-accent); }
+.font-row.selected .font-sample{ color:var(--c-fg); }
 
-/* ============================================================
-   CONTENT
-   ============================================================ */
 .thread-item{
-  padding:8px 0;
+  padding:8px 4px;
   border-bottom:1px solid var(--c-border);
+  cursor:pointer;
+  border-radius:var(--ui-radius);
+  box-shadow:var(--ui-shadow);
 }
 .thread-item:hover{ background:var(--c-bg-alt); }
+.cat-meta{ font-size:12px; color:var(--c-fg-muted); }
+.cat-meta i{ margin-left:6px; margin-right:2px; }
+.cat-meta i:first-of-type{ margin-left:8px; }
+.cat-sub{ font-weight:600; margin:4px 0 2px; }
+.cat-com{ font-size:13px; color:var(--c-fg); margin-bottom:4px; }
+.cat-thumb{ margin:2px 0 0; border-radius:var(--ui-radius); box-shadow:var(--ui-shadow); }
 .post{ padding:6px 0; }
 .post-header{ font-size:12px; color:var(--c-fg-muted); }
 .post-no{ font-weight:600; color:var(--c-fg); }
@@ -345,6 +342,8 @@ img.media, video.media{
   max-width:220px;
   max-height:220px;
   border:1px solid var(--c-border);
+  border-radius:var(--ui-radius);
+  box-shadow:var(--ui-shadow);
   display:block;
   margin:4px 0;
   cursor:zoom-in;
@@ -370,14 +369,91 @@ img.media.full, video.media.full{ max-width:100%; max-height:none; cursor:zoom-o
   color:var(--c-fg-muted);
 }
 
-/* ============================================================
-   MOBILE-FIRST ENHANCEMENTS  (>=700px)
-   ============================================================ */
+.modal-overlay{
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,.35);
+  z-index:200;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:12px;
+}
+.modal-overlay.hidden{ display:none; }
+.modal-box{
+  background:var(--c-bg);
+  border:1px solid var(--c-border);
+  border-radius:var(--ui-radius);
+  box-shadow:var(--ui-shadow);
+  width:100%;
+  max-width:560px;
+  max-height:88vh;
+  display:flex;
+  flex-direction:column;
+}
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 12px;
+  border-bottom:1px solid var(--c-border);
+}
+.modal-title{
+  font-family:var(--hand-font);
+  font-size:22px;
+}
+.modal-body{
+  padding:12px;
+  overflow-y:auto;
+}
+.modal-foot{
+  padding:10px 12px;
+  border-top:1px solid var(--c-border);
+  text-align:right;
+}
+.filter-help{
+  font-size:12px;
+  color:var(--c-fg-muted);
+  margin-bottom:10px;
+  border:1px solid var(--c-border);
+  padding:6px 10px;
+}
+.filter-help summary{ cursor:pointer; color:var(--c-fg); font-weight:600; }
+.filter-help ul{ margin:6px 0 2px; padding-left:18px; }
+.filter-help li{ margin-bottom:6px; }
+.filter-help code{ background:var(--c-bg-alt); padding:0 3px; }
+#filterText{
+  width:100%;
+  min-height:180px;
+  font-family:'JetBrains Mono', monospace;
+  font-size:12px;
+  resize:vertical;
+}
+
+/* stub rows for hidden-but-stubbed posts/threads */
+.stub-row{
+  font-size:12px;
+  color:var(--c-fg-muted);
+  padding:5px 0;
+  cursor:pointer;
+  border-bottom:1px dotted var(--c-border);
+}
+.stub-row:hover{ color:var(--c-fg); }
+.filtered-body{ display:none; }
+.filtered-body.shown{ display:block; }
+
+/* highlighted posts/threads */
+.post-highlight, .thread-item.post-highlight{
+  background:var(--c-bg-alt);
+  border-left:2px solid var(--c-accent);
+  padding-left:8px;
+}
+
 @media (min-width:700px){
   #shell{ padding-top:var(--sp-3); }
   #brand{ font-size:44px; }
   #nav{ flex-wrap:nowrap; }
-  #filters{ flex-wrap:nowrap; }
   #settings{ width:340px; left:auto; }
   img.media, video.media{ max-width:260px; max-height:260px; }
 }
@@ -405,24 +481,11 @@ img.media.full, video.media.full{ max-width:100%; max-height:none; cursor:zoom-o
     <span id="status"></span>
   </div>
 
-  <div id="filters">
-    <span>filter</span>
-    <input type="text" id="fName" placeholder="name">
-    <input type="text" id="fTrip" placeholder="trip">
-    <input type="text" id="fSub" placeholder="sub">
-    <input type="text" id="fCom" placeholder="com">
-    <button type="button" id="btnFilter">Apply</button>
-    <button type="button" id="btnClearFilter">Clear</button>
-  </div>
-
   <div id="content"></div>
 </div>
 
 <div id="modeline"></div>
 
-<!-- ============================================================
-     SETTINGS PANEL
-     ============================================================ -->
 <div id="settings">
   <button type="button" id="closeSettings">close</button>
   <h2>settings</h2>
@@ -430,6 +493,11 @@ img.media.full, video.media.full{ max-width:100%; max-height:none; cursor:zoom-o
   <div class="set-row">
     <label>font size (<span id="fontSizeVal">14</span>px)</label>
     <input type="range" id="fontSizeSlider" min="11" max="20" step="1" value="14">
+  </div>
+
+  <div class="set-row">
+    <label>rounded corners / shadows (<span id="radiusVal">0</span>)</label>
+    <input type="range" id="radiusSlider" min="0" max="15" step="1" value="0">
   </div>
 
   <div class="set-row">
@@ -480,13 +548,65 @@ img.media.full, video.media.full{ max-width:100%; max-height:none; cursor:zoom-o
   </div>
 
   <div class="set-row">
+    <label>filters</label>
+    <button type="button" id="btnOpenFilters" style="width:100%">Open filter rules&#8230;</button>
+  </div>
+
+  <div class="set-row">
     <label>cache</label>
     <button type="button" id="btnClearCache">clear cached data</button>
   </div>
 </div>
 
+<div id="filterOverlay" class="modal-overlay hidden">
+  <div id="filterModal" class="modal-box">
+    <div class="modal-head">
+      <span class="modal-title">filters</span>
+      <button type="button" id="closeFilters">close</button>
+    </div>
+
+    <div class="modal-body">
+      <details class="filter-help" open>
+        <summary>syntax</summary>
+        <p>
+          Use <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions" target="_blank" rel="noopener">regular expressions</a>, one per line.
+          Lines starting with <code>#</code> are ignored.
+          Example: <code>/weeaboo/i</code> filters posts containing "weeaboo", case-insensitive.
+          MD5 and Unique ID filtering use exact string matching, not regular expressions.
+        </p>
+        <ul>
+          <li>Separate settings for a rule with semicolons.</li>
+          <li><code>boards:a,jp;</code> &mdash; scope to boards, comma-separated. Global if omitted. Use <code>sfw</code> / <code>nsfw</code> for worksafe status. Prefix a site with <code>4:</code> and an asterisk <code>*</code> means all boards, e.g. <code>boards:4:*;</code></li>
+          <li><code>exclude:vg,v;</code> &mdash; same syntax, excludes boards from the filter.</li>
+          <li><code>op:only;</code> or <code>op:no;</code> &mdash; OPs (with thread) only, or replies only.</li>
+          <li><code>file:only;</code> or <code>file:no;</code> &mdash; only posts with / without a file.</li>
+          <li><code>stub:yes;</code> or <code>stub:no;</code> &mdash; force a clickable stub instead of the global setting.</li>
+          <li><code>highlight;</code> or <code>highlight:classname;</code> &mdash; highlight instead of hiding.</li>
+          <li><code>top:yes;</code> &mdash; pin highlighted OP threads to the top of the catalog.</li>
+          <li><code>notify;</code> &mdash; show a desktop notification instead of hiding.</li>
+          <li><code>type:name,comment;</code> &mdash; default is <code>subject,name,filename,comment</code>. Fields:
+            postID, name, uniqueID, tripcode, capcode, pass, email, subject, comment, flag, filename, dimensions, filesize, MD5.
+            Join fields with <code>+</code> to test them together, e.g. <code>type:filename+filesize;</code></li>
+        </ul>
+      </details>
+
+      <textarea id="filterText" spellcheck="false" placeholder="/weeaboo/i&#10;# comments start with a hash"></textarea>
+
+      <div class="chk-row" style="margin-top:10px;">
+        <input type="checkbox" id="showStubsChk">
+        <label for="showStubsChk" class="chk-label">show stubs for hidden posts (instead of removing them entirely)</label>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button type="button" id="saveFilters">Save</button>
+    </div>
+  </div>
+</div>
+
 <script type="text/javascript" src="colorpalette.js"></script>
 <script type="text/javascript" src="fontloader.js"></script>
+<script type="text/javascript" src="filterengine.js"></script>
 <script type="text/javascript">
 var PROXY = "https://chan-proxy.anonnousmes.workers.dev/?url=";
 var API = "https://a.4cdn.org/";
@@ -496,12 +616,10 @@ var BOARD = "";
 var THREAD = 0;
 var HIST = [];
 var T0 = new Date().getTime();
-var F_NAME = "";
-var F_TRIP = "";
-var F_SUB = "";
-var F_COM = "";
-var BOARDS = [];        // [{board,title}]
-var BOARDS_MAP = {};
+var BOARDS = [];        // [{board,title,ws}]
+var BOARDS_MAP = {};    // board -> title
+var WS_MAP = {};         // board -> 1 (sfw) | 0 (nsfw)
+var NOTIF_ASKED = false;
 
 if (!window.JSON) {
   window.JSON = { parse: function(s) { return eval("(" + s + ")"); } };
@@ -556,9 +674,6 @@ function add(h) {
   if (c) c.innerHTML += h;
 }
 
-/* ============================================================
-   low level transport
-   ============================================================ */
 function get(url, ok, err) {
   REQ++;
   var x;
@@ -580,13 +695,6 @@ function getj(url, ok, err) {
   }, err);
 }
 
-/* ============================================================
-   SMART CACHE  (stale-while-revalidate)
-   Every resource gets its own freshness/staleness budget:
-   fresh   -> serve cache, skip network entirely
-   stale   -> serve cache immediately, refresh in background
-   expired -> hit network, fall back to old cache on failure
-   ============================================================ */
 var SC_KEY = "sc_cache_v1";
 
 function scAll() {
@@ -628,88 +736,12 @@ function scFetch(key, ttlFresh, ttlStale, loader, onData) {
   });
 }
 
-/* ============================================================
-   filters
-   ============================================================ */
-function loadFilters() {
-  try {
-    if (window.localStorage) {
-      F_NAME = localStorage.getItem("f_name") || "";
-      F_TRIP = localStorage.getItem("f_trip") || "";
-      F_SUB = localStorage.getItem("f_sub") || "";
-      F_COM = localStorage.getItem("f_com") || "";
-      var n = document.getElementById("fName");
-      var t = document.getElementById("fTrip");
-      var s = document.getElementById("fSub");
-      var c = document.getElementById("fCom");
-      if (n) n.value = F_NAME;
-      if (t) t.value = F_TRIP;
-      if (s) s.value = F_SUB;
-      if (c) c.value = F_COM;
-    }
-  } catch (e) {}
-}
 
-function saveFilters() {
-  try {
-    if (window.localStorage) {
-      localStorage.setItem("f_name", F_NAME);
-      localStorage.setItem("f_trip", F_TRIP);
-      localStorage.setItem("f_sub", F_SUB);
-      localStorage.setItem("f_com", F_COM);
-    }
-  } catch (e) {}
-}
-
-function applyFilters() {
-  var n = document.getElementById("fName");
-  var t = document.getElementById("fTrip");
-  var s = document.getElementById("fSub");
-  var c = document.getElementById("fCom");
-  F_NAME = n ? n.value.trim() : "";
-  F_TRIP = t ? t.value.trim() : "";
-  F_SUB = s ? s.value.trim() : "";
-  F_COM = c ? c.value.trim() : "";
-  saveFilters();
-  if (BOARD && THREAD) loadThread(BOARD, THREAD);
-  else if (BOARD) loadCatalog(BOARD);
-}
-
-function clearFilters() {
-  F_NAME = F_TRIP = F_SUB = F_COM = "";
-  var n = document.getElementById("fName");
-  var t = document.getElementById("fTrip");
-  var s = document.getElementById("fSub");
-  var c = document.getElementById("fCom");
-  if (n) n.value = "";
-  if (t) t.value = "";
-  if (s) s.value = "";
-  if (c) c.value = "";
-  saveFilters();
-  if (BOARD && THREAD) loadThread(BOARD, THREAD);
-  else if (BOARD) loadCatalog(BOARD);
-}
-
-function matchFilter(post) {
-  try {
-    if (F_NAME && !(post.name || "").match(new RegExp(F_NAME, "i"))) return false;
-    if (F_TRIP && !(post.trip || "").match(new RegExp(F_TRIP, "i"))) return false;
-    if (F_SUB && !(post.sub || "").match(new RegExp(F_SUB, "i"))) return false;
-    if (F_COM && !(post.com || "").match(new RegExp(F_COM, "i"))) return false;
-  } catch (e) {
-    return true;
-  }
-  return true;
-}
-
-/* ============================================================
-   boards list + autosuggest
-   ============================================================ */
 function loadBoards() {
   scFetch("boards", 1000 * 60 * 60 * 24, 1000 * 60 * 60 * 24 * 7, function (ok, err) {
     getj(API + "boards.json", function (d) {
       if (d && d.boards) ok(d.boards.map(function (b) {
-        return { board: b.board, title: b.title };
+        return { board: b.board, title: b.title, ws: b.ws_board };
       }));
       else err("bad boards");
     }, err);
@@ -717,7 +749,11 @@ function loadBoards() {
     if (data) {
       BOARDS = data;
       BOARDS_MAP = {};
-      for (var i = 0; i < data.length; i++) BOARDS_MAP[data[i].board] = data[i].title;
+      WS_MAP = {};
+      for (var i = 0; i < data.length; i++) {
+        BOARDS_MAP[data[i].board] = data[i].title;
+        WS_MAP[data[i].board] = data[i].ws;
+      }
       updateBrand();
     }
   });
@@ -772,9 +808,6 @@ function initAutosuggest() {
   });
 }
 
-/* ============================================================
-   catalog / thread
-   ============================================================ */
 function loadCatalog(b) {
   b = (b || "").toLowerCase().replace(/[^a-z0-9]/g, "");
   if (!b) { status("board?"); return; }
@@ -794,44 +827,77 @@ function loadCatalog(b) {
   });
 }
 
+function filterVerdict(post, isOp) {
+  var hasFile = !!post.filename;
+  return FilterEngine.evaluate(post, { board: BOARD, isOp: isOp, hasFile: hasFile, wsBoard: WS_MAP[BOARD] });
+}
+
+function wrapStub(bodyHtml, label, id) {
+  return "<div class='stub-row' data-target='fb" + id + "'>" + label + " &mdash; <i>click to show</i></div>" +
+         "<div class='filtered-body' id='fb" + id + "'>" + bodyHtml + "</div>";
+}
+
+function bindStubs() {
+  var stubs = document.getElementsByClassName("stub-row");
+  for (var i = 0; i < stubs.length; i++) {
+    stubs[i].onclick = (function (row) {
+      return function () {
+        var body = document.getElementById(row.getAttribute("data-target"));
+        if (body) body.className = "filtered-body shown";
+        row.style.display = "none";
+      };
+    })(stubs[i]);
+  }
+}
+
 function showCatalog(b, pages) {
   var h = "<b>/" + b + "/</b><br>";
   if (!pages) { add(h + "<div class='error'>empty</div>"); return; }
+  var top = "", normal = "";
   for (var i = 0; i < pages.length; i++) {
     var pg = pages[i];
     if (!pg.threads) continue;
     for (var j = 0; j < pg.threads.length; j++) {
       var th = pg.threads[j];
-      if (!matchFilter(th)) continue;
-      h += catItem(b, th);
+      var verdict = filterVerdict(th, true);
+      if (verdict && verdict.notify) FilterEngine.notifyOnce(th, "/" + b + "/ No." + th.no + " matched a filter");
+      if (verdict && verdict.hidden) {
+        if (verdict.stub) normal += wrapStub(catItem(b, th, null), "[filtered] No." + th.no, "c" + th.no);
+        continue;
+      }
+      var hl = verdict && verdict.highlight ? { cls: verdict.highlightClass } : null;
+      var item = catItem(b, th, hl);
+      if (verdict && verdict.top) top += item; else normal += item;
     }
   }
-  add(h);
+  add(h + top + normal);
   bindCat();
+  bindStubs();
 }
 
-function catItem(b, th) {
+function catItem(b, th, hl) {
+  var cls = "thread-item" + (hl ? " post-highlight" + (hl.cls ? " hl-" + esc(hl.cls) : "") : "");
   var sub = th.sub || "";
   var com = strip(th.com || "").substring(0, 100);
-  var h = "<div class='thread-item'>";
-  h += "<a href='#' class='tl' data-b='" + b + "' data-n='" + th.no + "'>No." + th.no + "</a> ";
-  h += "<b>" + esc(sub) + "</b> R:" + (th.replies || 0) + " I:" + (th.images || 0) + "<br>";
+  var h = "<div class='" + cls + "' data-b='" + b + "' data-n='" + th.no + "'>";
+  h += "<div class='cat-meta'>No." + th.no +
+       " <i class='fa-solid fa-reply-all'></i> " + (th.replies || 0) +
+       " <i class='fa-solid fa-image'></i> " + (th.images || 0) + "</div>";
+  if (sub) h += "<div class='cat-sub'>" + esc(sub) + "</div>";
+  if (com) h += "<div class='cat-com'>" + esc(com) + (com.length >= 100 ? ".." : "") + "</div>";
   if (th.tim) {
-    h += "<img src='" + px(IMG + b + "/" + th.tim + "s.jpg") + "' width='" + (th.tn_w || 40) + "' height='" + (th.tn_h || 40) + "'>";
+    h += "<img class='cat-thumb' src='" + px(IMG + b + "/" + th.tim + "s.jpg") + "' width='" + (th.tn_w || 40) + "' height='" + (th.tn_h || 40) + "'>";
   }
-  h += esc(com) + (com.length >= 100 ? ".." : "");
   h += "</div>";
   return h;
 }
 
 function bindCat() {
-  var as = document.getElementsByTagName("a");
-  for (var i = 0; i < as.length; i++) {
-    if (as[i].className == "tl") {
-      as[i].onclick = (function(bb, nn) {
-        return function() { loadThread(bb, nn); return false; };
-      })(as[i].getAttribute("data-b"), as[i].getAttribute("data-n"));
-    }
+  var items = document.getElementsByClassName("thread-item");
+  for (var i = 0; i < items.length; i++) {
+    items[i].onclick = (function (bb, nn) {
+      return function () { loadThread(bb, nn); };
+    })(items[i].getAttribute("data-b"), items[i].getAttribute("data-n"));
   }
 }
 
@@ -897,7 +963,7 @@ function showThread(b, posts) {
   var op = posts[0];
   var bm = buildMap(posts);
   var h = "<b>/" + b + "/ No." + op.no + "</b><br>";
-  if (matchFilter(op)) h += postHtml(b, op, true);
+  h += renderPost(b, op, true);
   var kids = bm.map[op.no] || [];
   var seen = {};
   seen[op.no] = 1;
@@ -905,14 +971,25 @@ function showThread(b, posts) {
   for (var i = 1; i < posts.length; i++) {
     var p = posts[i];
     if (seen[p.no]) continue;
-    if (!matchFilter(p)) continue;
-    h += postHtml(b, p, false);
     seen[p.no] = 1;
+    h += renderPost(b, p, false);
     var ch = bm.map[p.no] || [];
     h += kidsHtml(b, ch, bm.map, seen);
   }
   add(h);
   bindImgs();
+  bindStubs();
+}
+
+function renderPost(b, p, isop) {
+  var verdict = filterVerdict(p, isop);
+  if (verdict && verdict.notify) FilterEngine.notifyOnce(p, "/" + b + "/ No." + p.no + " matched a filter");
+  if (verdict && verdict.hidden) {
+    if (!verdict.stub) return "";
+    return wrapStub(postHtml(b, p, isop, null), "[filtered] No." + p.no + " by " + esc(p.name || "Anonymous"), "t" + p.no);
+  }
+  var hl = verdict && verdict.highlight ? { cls: verdict.highlightClass } : null;
+  return postHtml(b, p, isop, hl);
 }
 
 function kidsHtml(b, list, map, seen) {
@@ -920,18 +997,24 @@ function kidsHtml(b, list, map, seen) {
   for (var i = 0; i < list.length; i++) {
     var p = list[i];
     if (seen[p.no]) continue;
-    if (!matchFilter(p)) continue;
     seen[p.no] = 1;
+    var rendered = renderPost(b, p, false);
+    if (!rendered) {
+      // fully hidden (no stub) - still recurse so its replies aren't lost
+      h += kidsHtml(b, map[p.no] || [], map, seen);
+      continue;
+    }
     h += "<div class='tree-indent'>";
-    h += postHtml(b, p, false);
+    h += rendered;
     h += kidsHtml(b, map[p.no] || [], map, seen);
     h += "</div>";
   }
   return h;
 }
 
-function postHtml(b, p, isop) {
-  var h = "<div class='post' id='p" + p.no + "'>";
+function postHtml(b, p, isop, hl) {
+  var cls = "post" + (hl ? " post-highlight" + (hl.cls ? " hl-" + esc(hl.cls) : "") : "");
+  var h = "<div class='" + cls + "' id='p" + p.no + "'>";
   h += "<div class='post-header'><span class='post-no'>No." + p.no + "</span> ";
   h += esc(p.name || "Anonymous");
   if (p.trip) h += " " + esc(p.trip);
@@ -1014,9 +1097,6 @@ function back() {
   else loadThread(p.b, p.n);
 }
 
-/* ============================================================
-   SETTINGS PANEL  (font size / font family / palette combobox)
-   ============================================================ */
 function applyFontFamily(family) {
   FontLoader.applyFont(family);
   var lbl = document.getElementById("curFontLabel");
@@ -1029,6 +1109,26 @@ function applyFontSize(px_) {
   if (lbl) lbl.innerHTML = px_;
   var sl = document.getElementById("fontSizeSlider");
   if (sl) sl.value = px_;
+}
+
+function applyRadius(v) {
+  v = parseInt(v, 10) || 0;
+  var root = document.documentElement.style;
+  root.setProperty("--ui-radius", v + "px");
+  root.setProperty("--ui-shadow", v > 0
+    ? "0 " + Math.round(v / 2) + "px " + (v * 2) + "px rgba(0,0,0," + (0.06 + v * 0.012).toFixed(2) + ")"
+    : "none");
+  var lbl = document.getElementById("radiusVal");
+  if (lbl) lbl.innerHTML = v;
+  var sl = document.getElementById("radiusSlider");
+  if (sl) sl.value = v;
+}
+
+function loadRadius() {
+  try { return parseInt(localStorage.getItem("ui_radius_v1"), 10) || 0; } catch (e) { return 0; }
+}
+function saveRadius(v) {
+  try { localStorage.setItem("ui_radius_v1", String(v)); } catch (e) {}
 }
 
 function loadHideMd5() {
@@ -1051,6 +1151,13 @@ function initSettingsPanel() {
   applyFontSize(FontLoader.loadSize());
   var savedFontChoice = FontLoader.loadChoice();
   applyFontFamily(savedFontChoice && savedFontChoice.family ? savedFontChoice.family : "Plus Jakarta Sans");
+
+  applyRadius(loadRadius());
+  var radiusSlider = document.getElementById("radiusSlider");
+  if (radiusSlider) radiusSlider.oninput = function () {
+    applyRadius(this.value);
+    saveRadius(parseInt(this.value, 10));
+  };
 
   var hideMd5 = loadHideMd5();
   applyHideMd5(hideMd5);
@@ -1081,12 +1188,14 @@ var PAL_STATE = { theme: "pastel", page: 0, loading: false, done: false };
 
 function swatchHtml(colors) {
   var h = "";
-  for (var i = 0; i < colors.length; i++) h += "<i style='background:#" + colors[i] + "'></i>";
+  for (var i = 0; i < colors.length; i++) {
+    h += "<i style='background:#" + colors[i] + "' title='#" + colors[i] + "'></i>";
+  }
   return h;
 }
 
 function selectPalette(colors, rowEl) {
-  ColorPaletteManager.applyPalette(colors);
+  ColorPaletteManager.applyPalette(colors, { mode: ColorPaletteManager.modeForTheme(PAL_STATE.theme) });
   ColorPaletteManager.saveChoice(colors, PAL_STATE.theme);
   document.getElementById("curSwatch").innerHTML = swatchHtml(colors);
   document.getElementById("curLabel").innerHTML = "#" + colors.join(" #");
@@ -1097,7 +1206,7 @@ function selectPalette(colors, rowEl) {
 
 var PAL_SENTINEL = null;
 var PAL_OBSERVER = null;
-var PAL_MAX_AUTOLOAD = 40; // hard stop so a broken observer can't loop forever
+var PAL_MAX_AUTOLOAD = 60; // hard stop so a broken observer can't loop forever
 
 function ensureSentinel(wrap) {
   if (!PAL_SENTINEL) {
@@ -1128,14 +1237,20 @@ function appendPaletteRows(list) {
 }
 
 function loadMorePalettes() {
-  if (PAL_STATE.loading || PAL_STATE.page > PAL_MAX_AUTOLOAD) return;
+  if (PAL_STATE.loading || PAL_STATE.done || PAL_STATE.page > PAL_MAX_AUTOLOAD) return;
   PAL_STATE.loading = true;
   var loading = document.getElementById("paletteLoading");
   if (loading) loading.className = "combo-loading";
-  ColorPaletteManager.fetchPage(PAL_STATE.theme, PAL_STATE.page, function (list) {
+  ColorPaletteManager.fetchPage(PAL_STATE.theme, PAL_STATE.page, function (list, fromCache, noMore) {
     appendPaletteRows(list);
     PAL_STATE.page++;
     PAL_STATE.loading = false;
+    if (noMore) {
+      PAL_STATE.done = true;
+      if (PAL_OBSERVER && PAL_SENTINEL) PAL_OBSERVER.unobserve(PAL_SENTINEL);
+      if (loading) { loading.innerHTML = "end of list"; loading.className = "combo-loading"; }
+      return;
+    }
     if (loading) loading.className = "combo-loading hidden";
     // if the sentinel is still inside the visible area after this batch
     // (dropdown not scrollable yet), load another batch immediately
@@ -1151,6 +1266,9 @@ function resetPaletteList() {
   wrap.innerHTML = "";
   PAL_SENTINEL = null;
   PAL_STATE.page = 0;
+  PAL_STATE.done = false;
+  var loading = document.getElementById("paletteLoading");
+  if (loading) loading.innerHTML = "loading more palettes&#8230;";
   loadMorePalettes();
 }
 
@@ -1205,10 +1323,10 @@ function initPaletteCombo() {
 }
 
 /* ---- font combobox ---- */
-var FONT_STATE = { cat: "sans", page: 0, loading: false };
+var FONT_STATE = { cat: "sans", page: 0, loading: false, done: false };
 var FONT_SENTINEL = null;
 var FONT_OBSERVER = null;
-var FONT_MAX_AUTOLOAD = 40;
+var FONT_MAX_AUTOLOAD = 60;
 
 function ensureFontSentinel(wrap) {
   if (!FONT_SENTINEL) {
@@ -1235,7 +1353,8 @@ function appendFontRows(list) {
     (function (family) {
       var row = document.createElement("div");
       row.className = "font-row";
-      row.innerHTML = esc(family) + "<span>Ag Bb Cc 123</span>";
+      row.innerHTML = "<span class='font-name'>" + esc(family) + "</span>" +
+                       "<span class='font-sample'>Ag Bb Cc 0123</span>";
       if (saved && saved.family === family) row.className = "font-row selected";
       row.onclick = function () { selectFont(family, row); };
       wrap.insertBefore(row, FONT_SENTINEL);
@@ -1243,7 +1362,9 @@ function appendFontRows(list) {
       // this is the "dynamic" part: nothing is fetched until a row
       // is actually about to be shown
       if (FONT_STATE.cat !== "system") {
-        row.getElementsByTagName("span")[0].style.fontFamily = "'" + family + "'";
+        var stack = "'" + family + "'";
+        row.getElementsByClassName("font-name")[0].style.fontFamily = stack;
+        row.getElementsByClassName("font-sample")[0].style.fontFamily = stack;
         FontLoader.ensureLoaded(family);
       }
     })(list[i]);
@@ -1252,14 +1373,20 @@ function appendFontRows(list) {
 }
 
 function loadMoreFonts() {
-  if (FONT_STATE.loading || FONT_STATE.page > FONT_MAX_AUTOLOAD) return;
+  if (FONT_STATE.loading || FONT_STATE.done || FONT_STATE.page > FONT_MAX_AUTOLOAD) return;
   FONT_STATE.loading = true;
   var loading = document.getElementById("fontLoading");
   if (loading) loading.className = "combo-loading";
-  FontLoader.fetchPage(FONT_STATE.cat, FONT_STATE.page, function (list) {
+  FontLoader.fetchPage(FONT_STATE.cat, FONT_STATE.page, function (list, noMore) {
     appendFontRows(list);
     FONT_STATE.page++;
     FONT_STATE.loading = false;
+    if (noMore) {
+      FONT_STATE.done = true;
+      if (FONT_OBSERVER && FONT_SENTINEL) FONT_OBSERVER.unobserve(FONT_SENTINEL);
+      if (loading) { loading.innerHTML = "end of list"; loading.className = "combo-loading"; }
+      return;
+    }
     if (loading) loading.className = "combo-loading hidden";
     var wrap = document.getElementById("fontList");
     if (wrap && FONT_SENTINEL && wrap.scrollHeight <= wrap.clientHeight + 4) {
@@ -1273,6 +1400,9 @@ function resetFontList() {
   wrap.innerHTML = "";
   FONT_SENTINEL = null;
   FONT_STATE.page = 0;
+  FONT_STATE.done = false;
+  var loading = document.getElementById("fontLoading");
+  if (loading) loading.innerHTML = "loading more fonts&#8230;";
   loadMoreFonts();
 }
 
@@ -1308,26 +1438,52 @@ function initFontCombo() {
   };
 }
 
-/* ============================================================
-   init
-   ============================================================ */
+/*
+	Init
+*/
+
+function initFilterModal() {
+  var openBtn = document.getElementById("btnOpenFilters");
+  var overlay = document.getElementById("filterOverlay");
+  var closeBtn = document.getElementById("closeFilters");
+  var saveBtn = document.getElementById("saveFilters");
+  var textarea = document.getElementById("filterText");
+  var stubsChk = document.getElementById("showStubsChk");
+
+  function openModal() {
+    if (textarea) textarea.value = FilterEngine.getText();
+    if (stubsChk) stubsChk.checked = FilterEngine.getShowStubs();
+    if (overlay) overlay.className = "modal-overlay";
+  }
+  function closeModal() {
+    if (overlay) overlay.className = "modal-overlay hidden";
+  }
+
+  if (openBtn) openBtn.onclick = openModal;
+  if (closeBtn) closeBtn.onclick = closeModal;
+  if (overlay) overlay.onclick = function (e) { if (e.target === overlay) closeModal(); };
+  if (saveBtn) saveBtn.onclick = function () {
+    FilterEngine.setText(textarea ? textarea.value : "");
+    FilterEngine.setShowStubs(stubsChk ? stubsChk.checked : true);
+    closeModal();
+    if (BOARD && THREAD) loadThread(BOARD, THREAD);
+    else if (BOARD) loadCatalog(BOARD);
+  };
+}
+
 function init() {
-  loadFilters();
   ColorPaletteManager.init();
   FontLoader.init();
+  FilterEngine.init();
 
   var bc = document.getElementById("btnCatalog");
   var bt = document.getElementById("btnThread");
   var bb = document.getElementById("btnBack");
-  var bf = document.getElementById("btnFilter");
-  var bcf = document.getElementById("btnClearFilter");
   var bi = document.getElementById("boardInput");
   var ti = document.getElementById("threadInput");
   if (bc) bc.onclick = function() { loadCatalog(bi ? bi.value : "a"); };
   if (bt) bt.onclick = function() { loadThread(bi ? bi.value : BOARD, ti ? ti.value : ""); };
   if (bb) bb.onclick = back;
-  if (bf) bf.onclick = applyFilters;
-  if (bcf) bcf.onclick = clearFilters;
   if (bi) bi.onkeypress = function(e) {
     e = e || window.event;
     if (e.keyCode == 13) { loadCatalog(bi.value); return false; }
@@ -1342,6 +1498,7 @@ function init() {
   initSettingsPanel();
   initPaletteCombo();
   initFontCombo();
+  initFilterModal();
 
   setInterval(tick, 1000);
   tick();

@@ -72,8 +72,8 @@ other owns color, neither touches the other's territory or the reader's own
 layout logic.
 
 ## ToDo
-- random fetched anime profile pictures (50% rounded corner value) next to its Poster ID
-- Improve color palette loader logic
-- fix font/color menu chooser layout adjustment bug (elements start to flicker when scrolling down in the color/font combobox)
-- improve readability for info box (Date/Additional information line)
-- add option to enable/disable ui shadows/rounded corners
+- [] random fetched anime profile pictures (50% rounded corner value) next to its Poster ID
+- [] Improve color palette loader logic
+- [] fix font/color menu chooser layout adjustment bug (elements start to flicker when scrolling down in the color/font combobox)
+- [] improve readability for info box (Date/Additional information line)
+- [] add option to enable/disable ui shadows/rounded corners

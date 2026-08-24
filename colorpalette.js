@@ -11,8 +11,8 @@
  *
  * Nothing in here touches DOM structure of the reader itself -
  * it only ever writes to document.documentElement.style and to
- * the combobox markup it owns. Everything else (fonts, layout,
- * board logic) lives in reader.html.
+ * the combobox markup it owns. Everything else (fonts, filters,
+ * layout, board logic) lives in reader.html.
  * ---------------------------------------------------------------
  */
 
@@ -31,12 +31,10 @@ var ColorPaletteManager = (function () {
   var CACHE_STALE_OK = 1000 * 60 * 60 * 24 * 30; // still usable (stale) for 30d
 
   /* ---------------------------------------------------------------
-   * A hand-picked fallback set. Used the instant nothing is cached
-   * yet (so the combobox is never empty on first paint) and as a
-   * last resort if the network scrape fails outright (colorhunt is
-   * a client-rendered site with no documented public API, so the
-   * live scrape is best-effort - this guarantees the feature always
-   * works regardless).
+   * A hand-picked fallback set - big enough that scrolling through
+   * the combobox doesn't feel repetitive even when the live scrape
+   * comes up empty (colorhunt has no documented public API, so the
+   * live attempt is always best-effort - see scrapeLive below).
    * ------------------------------------------------------------- */
   var FALLBACK = {
     pastel: [
@@ -51,7 +49,25 @@ var ColorPaletteManager = (function () {
       ["ede7e3", "e0afa0", "cdc2ae", "8e8d8a"],
       ["fdecef", "f9d5e5", "eeac99", "e06377"],
       ["f1faee", "a8dadc", "457b9d", "1d3557"],
-      ["fffbf0", "ffe5ec", "ffc2d1", "ffb3c6"]
+      ["fffbf0", "ffe5ec", "ffc2d1", "ffb3c6"],
+      ["f8f4ea", "e8e4d8", "d6cfc3", "b8a99a"],
+      ["fff8f0", "ffe8d6", "ddbea9", "cb997e"],
+      ["f4f1de", "e07a5f", "3d405b", "81b29a"],
+      ["fef9ef", "e4c1f9", "d0f4de", "a9def9"],
+      ["fbf8cc", "fde4cf", "ffcfd2", "f1c0e8"],
+      ["f0efeb", "cfe1b9", "9cadce", "7ec4cf"],
+      ["fff5e4", "ffe3e1", "ffd1d1", "ff9494"],
+      ["e8f6ef", "d0e6df", "d5c6e0", "aa96da"],
+      ["f6e8ea", "eaadc5", "cbaacb", "97a2ff"],
+      ["fefbf6", "f5e0c3", "e6a4b4", "b392ac"],
+      ["f9f5f6", "f8e8ee", "fdcedf", "f2bed1"],
+      ["eef7ff", "cddafd", "bde0fe", "a2d2ff"],
+      ["fffaf0", "fcefdc", "f8d9c4", "f4b393"],
+      ["f4fff8", "d8f3dc", "b7e4c7", "95d5b2"],
+      ["fff0f5", "ffdde1", "ffc2d4", "ff8fab"],
+      ["f7ede2", "f0dbdb", "d3cedf", "b8bedd"],
+      ["fdf6ec", "faedcd", "e9edc9", "ccd5ae"],
+      ["fefefe", "e2ece9", "cdb4db", "ffc8dd"]
     ],
     dark: [
       ["0d1b2a", "1b263b", "415a77", "778da9"],
@@ -65,7 +81,25 @@ var ColorPaletteManager = (function () {
       ["1a1a2e", "16213e", "0f3460", "e94560"],
       ["0f0f0f", "1a1a1a", "2b2b2b", "8c8c8c"],
       ["05070a", "13202e", "1e3140", "9db5c9"],
-      ["12100e", "231f20", "3a3335", "8d8380"]
+      ["12100e", "231f20", "3a3335", "8d8380"],
+      ["080708", "3d2c2e", "543c52", "a997df"],
+      ["0a0e0d", "133020", "1e4d2b", "88c9a1"],
+      ["090909", "1c1c1c", "2e2e2e", "b0a695"],
+      ["020202", "16161a", "23232e", "6f6fbe"],
+      ["0e0e10", "1c1c24", "26262f", "ff6b6b"],
+      ["06070a", "0e1420", "162032", "3f7cac"],
+      ["050505", "111111", "1e1e1e", "d9c5a0"],
+      ["0c0a1e", "1b1533", "2e2249", "8878c3"],
+      ["04070d", "0c1220", "16233a", "5c7cfa"],
+      ["0a0908", "1e1a17", "352f2c", "c9a66b"],
+      ["030303", "0d0d0d", "1a1a1a", "e0b0ff"],
+      ["07090f", "121722", "1d2333", "4cc9f0"],
+      ["0b0c10", "1f2833", "2c3e50", "66fcf1"],
+      ["09111a", "12232e", "1c313a", "4f7d80"],
+      ["0d0d0d", "1a0f0f", "331a1a", "cc3333"],
+      ["0a0a0f", "141420", "1f1f30", "7b68ee"],
+      ["020508", "0a1520", "13293d", "3e8ed0"],
+      ["050403", "141110", "24201d", "b08968"]
     ]
   };
 
@@ -185,40 +219,61 @@ var ColorPaletteManager = (function () {
     });
   }
 
+  function mergeUnique(base, extra) {
+    var seen = {};
+    var out = [];
+    base.concat(extra).forEach(function (q) {
+      var k = q.join("-");
+      if (!seen[k]) { seen[k] = 1; out.push(q); }
+    });
+    return out;
+  }
+
   /* -------------------- public: fetch a page of 4 -------------------- */
 
   // theme: "pastel" | "dark"
   // page:  0-based page index, 4 palettes per page
-  // cb(paletteArray, fromCache)
+  // cb(paletteArray, fromCache, noMore)
+  //   noMore === true means the pool is exhausted - the caller
+  //   should stop requesting further pages for this theme instead
+  //   of looping back over the same swatches (that was the repeat
+  //   bug: padding with a modulo wrap kept serving duplicates
+  //   forever once the pool ran out).
   function fetchPage(theme, page, cb) {
     var cacheKey = "palettes:" + theme;
     var entry = cacheRead(cacheKey);
     var pool = entry ? entry.data.slice() : [];
+    if (!pool.length) pool = (FALLBACK[theme] || FALLBACK.pastel).slice();
 
     function serveFromPool(p) {
       var start = page * 4;
       var slice = p.slice(start, start + 4);
-      if (slice.length < 4) {
-        // top up with fallback swatches so the UI always shows 4
+      var noMore = start + 4 >= p.length;
+      if (slice.length < 4 && p.length) {
+        // only pads if the pool itself is smaller than one page -
+        // never wraps back to the start, so nothing repeats
         var fb = FALLBACK[theme] || FALLBACK.pastel;
-        var i = 0;
-        while (slice.length < 4) {
-          slice.push(fb[(start + i) % fb.length]);
-          i++;
+        for (var i = 0; i < fb.length && slice.length < 4; i++) {
+          var dup = false;
+          for (var j = 0; j < slice.length; j++) if (slice[j].join(",") === fb[i].join(",")) dup = true;
+          if (!dup) slice.push(fb[i]);
         }
+        noMore = true;
       }
-      return slice;
+      return { slice: slice, noMore: noMore };
     }
 
     if (entry && cacheAge(entry) < CACHE_TTL) {
       // fresh cache - serve immediately, no network call needed
-      cb(serveFromPool(pool), true);
+      var r1 = serveFromPool(pool);
+      cb(r1.slice, true, r1.noMore);
       return;
     }
 
     if (entry && cacheAge(entry) < CACHE_STALE_OK) {
       // stale but usable: serve now, refresh quietly in the background
-      cb(serveFromPool(pool), true);
+      var r2 = serveFromPool(pool);
+      cb(r2.slice, true, r2.noMore);
       scrapeLive(theme, page, function (quads) {
         if (quads && quads.length) {
           var merged = mergeUnique(pool, quads);
@@ -233,34 +288,36 @@ var ColorPaletteManager = (function () {
       var merged = quads && quads.length ? mergeUnique(pool, quads) : pool;
       if (!merged.length) merged = FALLBACK[theme] || FALLBACK.pastel;
       cacheWrite(cacheKey, merged);
-      cb(serveFromPool(merged), !quads);
+      var r3 = serveFromPool(merged);
+      cb(r3.slice, !quads, r3.noMore);
     });
-  }
-
-  function mergeUnique(base, extra) {
-    var seen = {};
-    var out = [];
-    base.concat(extra).forEach(function (q) {
-      var k = q.join("-");
-      if (!seen[k]) { seen[k] = 1; out.push(q); }
-    });
-    return out;
   }
 
   /* -------------------- applying a palette to the UI -------------------- */
 
-  // Sorts the 4 colors by luminance and derives semantic roles so
-  // ANY scraped palette (light or dark) maps sensibly onto the UI.
+  // Sorts the 4 colors by luminance and derives semantic roles.
+  // `mode` ("light" | "dark") is authoritative when supplied - it
+  // comes straight from which combobox tab (pastel/dark) the color
+  // was picked from, so a "dark" palette always gets a dark
+  // background even when its 4 colors, taken alone, would look
+  // lighter on average (this was the bug: guessing purely from
+  // in-palette luminance sums misclassified plenty of legitimate
+  // dark palettes as "light" because their brightest accent color
+  // outweighed the two darkest ones in the sum).
   function applyPalette(colors, opts) {
     opts = opts || {};
     var sorted = colors.slice().sort(function (a, b) {
       return luminance(a) - luminance(b);
     });
     var darkest = sorted[0], low = sorted[1], high = sorted[2], lightest = sorted[3];
-    var overallLight = luminance(lightest) + luminance(high) > luminance(darkest) + luminance(low);
+
+    var isLight;
+    if (opts.mode === "light") isLight = true;
+    else if (opts.mode === "dark") isLight = false;
+    else isLight = luminance(lightest) + luminance(high) > luminance(darkest) + luminance(low);
 
     var bg, bgAlt, fg, fgMuted, accent, border;
-    if (overallLight) {
+    if (isLight) {
       bg = lightest; bgAlt = high; fg = darkest; fgMuted = low; accent = low; border = high;
     } else {
       bg = darkest; bgAlt = low; fg = lightest; fgMuted = high; accent = high; border = low;
@@ -269,7 +326,7 @@ var ColorPaletteManager = (function () {
     // make sure text/background always stay legible regardless of
     // what four colors we happened to scrape
     if (contrastRatio(bg, fg) < 3.5) {
-      fg = overallLight ? "1a1a1a" : "f2f2f2";
+      fg = isLight ? "1a1a1a" : "f2f2f2";
     }
 
     var root = document.documentElement.style;
@@ -280,7 +337,7 @@ var ColorPaletteManager = (function () {
     root.setProperty("--c-accent", "#" + accent);
     root.setProperty("--c-border", "#" + border);
     root.setProperty("--c-link", "#" + accent);
-    document.documentElement.setAttribute("data-theme-mode", overallLight ? "light" : "dark");
+    document.documentElement.setAttribute("data-theme-mode", isLight ? "light" : "dark");
   }
 
   function saveChoice(colors, theme) {
@@ -291,10 +348,14 @@ var ColorPaletteManager = (function () {
     return lsGet(LS_CHOICE, null);
   }
 
+  function modeForTheme(theme) {
+    return theme === "dark" ? "dark" : "light";
+  }
+
   function init() {
     var choice = loadChoice();
-    if (choice && choice.colors) applyPalette(choice.colors, { silent: true });
-    else applyPalette(FALLBACK.pastel[0]);
+    if (choice && choice.colors) applyPalette(choice.colors, { mode: modeForTheme(choice.theme) });
+    else applyPalette(FALLBACK.pastel[0], { mode: "light" });
   }
 
   return {
@@ -302,6 +363,7 @@ var ColorPaletteManager = (function () {
     applyPalette: applyPalette,
     saveChoice: saveChoice,
     loadChoice: loadChoice,
+    modeForTheme: modeForTheme,
     init: init,
     FALLBACK: FALLBACK
   };

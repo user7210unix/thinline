@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>thinline</title>
+
+<link rel="icon" type="image/x-icon" href="https://s.4cdn.org/image/favicon.ico">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/board.css">
+<link rel="stylesheet" href="css/overlays.css">
+<link rel="stylesheet" href="css/contextmenu.css">
+<link rel="stylesheet" href="css/watcher.css">
+</head>
+<body>
+
+
+<div id="shell">
+
+  <div id="topbar">
+    <div id="brand"><span id="brandBoard">/ - /</span></div>
+    <button type="button" id="gearBtn" title="settings"><i class="fa-solid fa-gears"></i></button>
+  </div>
+
+  <div id="nav">
+    <div class="ac-wrap">
+      <input type="text" id="boardInput" value="a" size="3" autocomplete="off">
+      <div id="boardAC" class="ac-list hidden"></div>
+    </div>
+    <button type="button" id="btnCatalog" class="nav-btn">Go</button>
+    <div class="seg" id="viewSeg">
+      <button type="button" data-mode="index" class="active">Index</button>
+      <button type="button" data-mode="catalog">Catalog</button>
+    </div>
+    <div class="nav-sort" id="sortBox">
+      <button type="button" id="sortToggle" class="nav-btn">Sort: <span id="curSortLabel">Bump</span></button>
+      <div class="nav-sort-menu hidden" id="sortMenu">
+        <button type="button" data-sort="bump" class="active">Bump order</button>
+        <button type="button" data-sort="replies">Most replies</button>
+        <button type="button" data-sort="images">Most images</button>
+        <button type="button" data-sort="newest">Newest</button>
+        <button type="button" data-sort="oldest">Oldest</button>
+      </div>
+    </div>
+    <button type="button" id="btnFilteredToggle" class="nav-btn" title="show only filtered/hidden threads">Filtered <span class="filt-badge zero" id="filtBadge">0</span></button>
+    <button type="button" id="btnBack" class="nav-btn">Back</button>
+    <button type="button" id="navWatchBtn" class="nav-btn" title="watched threads">Watching <span class="filt-badge zero" id="watchBadge">0</span></button>
+    <span id="status"></span>
+
+  </div>
+
+  <div id="content"></div>
+</div>
+
+<div id="modeline"></div>
+
+<div id="settings">
+  <button type="button" id="closeSettings">close</button>
+  <h2>settings</h2>
+
+  <div class="set-row">
+    <label>font size (<span id="fontSizeVal">14</span>px)</label>
+    <input type="range" id="fontSizeSlider" min="11" max="20" step="1" value="14">
+  </div>
+
+  <div class="set-row">
+    <label>layout columns</label>
+    <div class="seg" id="columnsSeg">
+      <button type="button" data-cols="1" class="active">1</button>
+      <button type="button" data-cols="2">2</button>
+      <button type="button" data-cols="3">3</button>
+    </div>
+  </div>
+
+  <div class="set-row">
+    <label>rounded corners (<span id="radiusVal">0</span>)</label>
+    <input type="range" id="radiusSlider" min="0" max="15" step="1" value="0">
+  </div>
+
+  <div class="set-row">
+    <label>shadows</label>
+    <div class="chk-row">
+      <input type="checkbox" id="shadowChk">
+      <label for="shadowChk" class="chk-label">enable drop shadows on cards, buttons and popups</label>
+    </div>
+  </div>
+
+  <div class="set-row">
+    <label>ui font</label>
+    <div class="combo" id="fontBox">
+      <button type="button" class="combo-toggle" id="fontToggle">
+        <span id="curFontLabel">choose a font</span>
+      </button>
+      <div class="combo-menu hidden" id="fontMenu">
+        <div class="combo-tabs" id="fontTabs">
+          <button type="button" data-cat="sans" class="tab active">Sans</button>
+          <button type="button" data-cat="serif" class="tab">Serif</button>
+          <button type="button" data-cat="mono" class="tab">Mono</button>
+          <button type="button" data-cat="hand" class="tab">Hand</button>
+          <button type="button" data-cat="display" class="tab">Display</button>
+          <button type="button" data-cat="system" class="tab">System</button>
+        </div>
+        <div class="font-list" id="fontList"></div>
+        <div class="combo-loading hidden" id="fontLoading">loading more fonts&#8230;</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="set-row">
+    <label>color palette</label>
+    <div class="combo" id="paletteBox">
+      <button type="button" class="combo-toggle" id="paletteToggle">
+        <span class="swatch-row big" id="curSwatch"></span>
+      </button>
+      <div class="combo-menu hidden" id="paletteMenu">
+        <div class="combo-tabs">
+          <button type="button" data-theme="pastel" class="tab active">Pastel</button>
+          <button type="button" data-theme="dark" class="tab">Dark</button>
+          <button type="button" data-theme="popular" class="tab">Popular</button>
+        </div>
+        <div class="palette-list" id="paletteList"></div>
+        <div class="combo-loading hidden" id="paletteLoading">loading more palettes&#8230;</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="set-row">
+    <label>filters</label>
+    <button type="button" id="btnOpenFilters" style="width:100%">Open filter rules&#8230;</button>
+  </div>
+
+  <details class="adv-section">
+    <summary>advanced</summary>
+    <div class="adv-body">
+      <div class="set-row">
+        <label>files</label>
+        <div class="chk-row">
+          <input type="checkbox" id="hideMd5Chk">
+          <label for="hideMd5Chk" class="chk-label">hide MD5 hashes</label>
+        </div>
+      </div>
+
+      <div class="set-row">
+        <label>links</label>
+        <div class="chk-row">
+          <input type="checkbox" id="linkPreviewChk">
+          <label for="linkPreviewChk" class="chk-label">show hover preview popup for links</label>
+        </div>
+      </div>
+
+      <div class="set-row">
+        <label>thread watcher</label>
+        <div class="chk-row">
+          <input type="checkbox" id="watchShadowChk">
+          <label for="watchShadowChk" class="chk-label">drop shadow on the floating watch window</label>
+        </div>
+      </div>
+
+      <div class="set-row">
+        <label>status bar</label>
+        <div class="chk-row">
+          <input type="checkbox" id="statusBarChk">
+          <label for="statusBarChk" class="chk-label">show the bottom status bar</label>
+        </div>
+      </div>
+
+      <div class="set-row">
+        <label>cache</label>
+        <button type="button" id="btnClearCache">clear cached data</button>
+      </div>
+    </div>
+  </details>
+</div>
+
+<div id="filterOverlay" class="modal-overlay hidden">
+  <div id="filterModal" class="modal-box">
+    <div class="modal-head">
+      <span class="modal-title">filters</span>
+      <button type="button" id="closeFilters">close</button>
+    </div>
+
+    <div class="modal-body">
+      <details class="filter-help" open>
+        <summary>syntax</summary>
+        <p>
+          Use <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions" target="_blank" rel="noopener">regular expressions</a>, one per line.
+          Lines starting with <code>#</code> are ignored.
+          Example: <code>/weeaboo/i</code> filters posts containing "weeaboo", case-insensitive.
+          MD5 and Unique ID filtering use exact string matching, not regular expressions.
+        </p>
+        <ul>
+          <li>Separate settings for a rule with semicolons.</li>
+          <li><code>boards:a,jp;</code> &mdash; scope to boards, comma-separated. Global if omitted. Use <code>sfw</code> / <code>nsfw</code> for worksafe status. Prefix a site with <code>4:</code> and an asterisk <code>*</code> means all boards, e.g. <code>boards:4:*;</code></li>
+          <li><code>exclude:vg,v;</code> &mdash; same syntax, excludes boards from the filter.</li>
+          <li><code>op:only;</code> or <code>op:no;</code> &mdash; OPs (with thread) only, or replies only.</li>
+          <li><code>file:only;</code> or <code>file:no;</code> &mdash; only posts with / without a file.</li>
+          <li><code>stub:yes;</code> or <code>stub:no;</code> &mdash; force a clickable stub instead of the global setting.</li>
+          <li><code>highlight;</code> or <code>highlight:classname;</code> &mdash; highlight instead of hiding.</li>
+          <li><code>top:yes;</code> &mdash; pin highlighted OP threads to the top of the catalog.</li>
+          <li><code>notify;</code> &mdash; show a desktop notification instead of hiding.</li>
+          <li><code>type:name,comment;</code> &mdash; default is <code>subject,name,filename,comment</code>. Fields:
+            postID, name, uniqueID, tripcode, capcode, pass, email, subject, comment, flag, filename, dimensions, filesize, MD5.
+            Join fields with <code>+</code> to test them together, e.g. <code>type:filename+filesize;</code></li>
+        </ul>
+      </details>
+
+      <textarea id="filterText" spellcheck="false" placeholder="/weeaboo/i&#10;# comments start with a hash"></textarea>
+
+      <div class="chk-row" style="margin-top:10px;">
+        <input type="checkbox" id="showStubsChk">
+        <label for="showStubsChk" class="chk-label">show stubs for hidden posts (instead of removing them entirely)</label>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button type="button" id="saveFilters">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="linkPreview" class="link-preview hidden"></div>
+<div id="linkAction" class="link-action hidden"></div>
+<div id="ctxMenu" class="ctxmenu hidden"></div>
+<div id="cursorPreview" class="cursor-preview hidden"><img id="cursorPreviewImg" alt=""></div>
+
+<div id="splitView" class="split-view">
+  <div class="split-head">
+    <span class="split-sitename" id="splitSiteName"></span>
+    <div class="split-controls">
+      <button type="button" id="splitOpenTab" title="open in new tab"><i class="fa-solid fa-up-right-from-square"></i></button>
+      <button type="button" id="splitClose" title="close">&#10005;</button>
+    </div>
+  </div>
+  <div class="split-body reader-mode" id="splitBody"></div>
+</div>
+
+<div id="watchWindow" class="watch-window hidden">
+  <div class="watch-head" id="watchHead">
+    <span class="watch-head-title">Watching <span class="filt-badge zero" id="watchWinBadge">0</span></span>
+    <div class="watch-controls">
+      <button type="button" id="watchMinBtn" title="minimize">&#8722;</button>
+      <button type="button" id="watchCloseBtn" title="close">&#10005;</button>
+    </div>
+  </div>
+  <div class="watch-body" id="watchBody"></div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

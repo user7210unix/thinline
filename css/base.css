@@ -1,0 +1,88 @@
+
+
+:root{
+  --c-bg:#fffdf6;
+  --c-bg-alt:#ffe0e9;
+  --c-fg:#262220;
+  --c-fg-muted:#6b6660;
+  --c-accent:#a2d2ff;
+  --c-border:#cdb4db;
+  --c-link:#3a6ea5;
+  --c-quote:#5c8a3a;
+
+  --ui-font:'Plus Jakarta Sans', -apple-system, sans-serif;
+  --hand-font:'Caveat', cursive;
+  --ui-fontsize:14px;
+
+  /* derived sizes, not fixed px - keeps everything scaling with the slider */
+  --fs-2xs: calc(var(--ui-fontsize) - 4px);
+  --fs-xs: calc(var(--ui-fontsize) - 3px);
+  --fs-sm: calc(var(--ui-fontsize) - 2px);
+  --fs-base: var(--ui-fontsize);
+  --fs-md: calc(var(--ui-fontsize) + 1px);
+  --fs-lg: calc(var(--ui-fontsize) + 5px);
+  --fs-xl: calc(var(--ui-fontsize) + 8px);
+
+  --sp-1:4px;
+  --sp-2:8px;
+  --sp-3:14px;
+  --sp-4:22px;
+
+  /* rounding and shadow are separate toggles now, used to be tied together */
+  --ui-radius:0px;
+  --ui-shadow:none;
+  --watch-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+
+*{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+body{
+  margin:0;
+  padding:0;
+  font-family:var(--ui-font);
+  font-size:var(--ui-fontsize);
+  background:var(--c-bg);
+  color:var(--c-fg);
+  line-height:1.5;
+  transition:background .15s ease, color .15s ease;
+}
+a{ color:var(--c-link); text-decoration:none; padding:0 1px; margin:0 -1px; transition:background-color .1s ease, color .1s ease; }
+a:hover{ background:var(--c-accent); color:var(--c-fg); text-decoration:none; }
+a:visited{ opacity:.85; }
+button, input, select{
+  font-family:var(--ui-font);
+  font-size:calc(var(--ui-fontsize) - 1px);
+  color:var(--c-fg);
+  background:var(--c-bg);
+  border:1px solid var(--c-border);
+  border-radius:var(--ui-radius);
+  padding:6px 9px;
+  outline:none;
+}
+button{
+  cursor:pointer;
+  background:var(--c-bg);
+  box-shadow:var(--ui-shadow);
+  transition:background-color .12s ease, border-color .12s ease, color .12s ease;
+}
+button:hover{ background:var(--c-accent); border-color:var(--c-accent); }
+button:active{ transform:translateY(1px); }
+button:disabled{ opacity:.4; cursor:default; }
+input:focus, select:focus, button:focus{ border-color:var(--c-accent); }
+::selection{ background:var(--c-accent); color:var(--c-fg); }
+
+.nav-btn{
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  font-size:var(--fs-sm);
+  font-weight:600;
+  padding:7px 12px;
+}
+
+
+#shell{
+  max-width:860px;
+  margin:0 auto;
+  padding:var(--sp-2) var(--sp-3) 40px;
+}
+

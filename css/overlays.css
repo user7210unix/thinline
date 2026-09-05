@@ -1,0 +1,157 @@
+/* stub rows for hidden-but-stubbed posts/threads */
+.stub-row{
+  font-size:var(--fs-sm);
+  color:var(--c-fg-muted);
+  padding:5px 0;
+  cursor:pointer;
+  border-bottom:1px dotted var(--c-border);
+}
+.stub-row:hover{ color:var(--c-fg); }
+.filtered-body{ display:none; }
+.filtered-body.shown{ display:block; }
+
+/* highlighted posts/threads */
+.post-highlight, .thread-item.post-highlight{
+  background:var(--c-bg-alt);
+  border-left:2px solid var(--c-accent);
+  padding-left:8px;
+}
+
+/* manually (shift-click) hidden items, shown only in "filtered" view */
+.manually-hidden-note{
+  font-size:var(--fs-xs);
+  color:var(--c-fg-muted);
+  padding:3px 0;
+  border-bottom:1px dashed var(--c-border);
+  cursor:pointer;
+}
+.manually-hidden-note:hover{ color:var(--c-fg); }
+.filtered-empty{ color:var(--c-fg-muted); font-size:var(--fs-md); padding:10px 0; }
+
+/* plain-link hover tooltip - no fetch, just domain+favicon. yt/sc get the real oembed card instead */
+.link-preview{
+  position:fixed;
+  z-index:500;
+  width:280px;
+  max-width:80vw;
+  background:var(--c-bg);
+  border:1px solid var(--c-border);
+  box-shadow:0 6px 24px rgba(0,0,0,.22);
+  font-family:var(--ui-font);
+  pointer-events:none;
+  overflow:hidden;
+}
+.link-preview.hidden{ display:none; }
+.link-preview.lp-lite{ width:auto; max-width:260px; }
+.link-preview .lp-lite-row{ display:flex; align-items:center; gap:6px; padding:7px 9px 2px; font-size:var(--fs-sm); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.link-preview .lp-lite-row img{ width:14px; height:14px; flex:0 0 auto; }
+.link-preview .lp-lite-hint{ font-size:var(--fs-2xs); color:var(--c-fg-muted); padding:0 9px 7px; }
+.link-preview .lp-img{ width:100%; max-height:150px; object-fit:cover; display:block; background:var(--c-bg-alt); }
+.link-preview .lp-body{ padding:9px 10px; }
+.link-preview .lp-site{ font-size:var(--fs-2xs); text-transform:uppercase; letter-spacing:.04em; color:var(--c-fg-muted); display:flex; align-items:center; gap:5px; margin-bottom:3px; }
+.link-preview .lp-site img{ width:12px; height:12px; }
+.link-preview .lp-title{ font-size:var(--fs-md); font-weight:700; line-height:1.25; margin-bottom:3px; }
+.link-preview .lp-desc{ font-size:var(--fs-xs); color:var(--c-fg-muted); line-height:1.35; max-height:56px; overflow:hidden; }
+.link-preview .lp-embed{ width:100%; }
+.link-preview .lp-embed iframe{ width:100%; border:none; display:block; }
+.link-preview .lp-loading{ padding:14px 10px; font-size:var(--fs-sm); color:var(--c-fg-muted); text-align:center; }
+
+/* the small "what do you want to do with this link" popup shown on click */
+.link-action{
+  position:fixed;
+  z-index:520;
+  min-width:200px;
+  background:var(--c-bg);
+  border:1px solid var(--c-border);
+  box-shadow:0 6px 20px rgba(0,0,0,.24);
+  padding:4px;
+  font-family:var(--ui-font);
+}
+.link-action.hidden{ display:none; }
+.link-action-url{ padding:6px 10px 4px; font-size:var(--fs-2xs); color:var(--c-fg-muted); font-family:'JetBrains Mono', monospace; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.link-action button{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  width:100%;
+  text-align:left;
+  padding:8px 10px;
+  border:none;
+  background:none;
+  box-shadow:none;
+  border-radius:0;
+  font-size:var(--fs-sm);
+  color:var(--c-fg);
+}
+.link-action button:hover{ background:var(--c-accent); }
+
+/* reader pane docks right, thinline stays visible on the left */
+.split-view{
+  position:fixed;
+  top:0; right:0;
+  width:52%;
+  height:calc(100% - 22px);
+  z-index:250;
+  background:var(--c-bg);
+  border-left:1px solid var(--c-border);
+  box-shadow:-8px 0 24px rgba(0,0,0,.18);
+  display:flex;
+  flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .18s ease;
+}
+.split-view.open{ transform:translateX(0); }
+.split-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:8px 10px;
+  border-bottom:1px solid var(--c-border);
+  background:var(--c-bg-alt);
+  flex:0 0 auto;
+}
+.split-sitename{ font-family:'JetBrains Mono', monospace; font-size:var(--fs-xs); color:var(--c-fg-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.split-controls{ display:flex; gap:4px; flex:0 0 auto; }
+.split-controls button{ padding:5px 9px; font-size:var(--fs-xs); }
+.split-body{ flex:1 1 auto; overflow-y:auto; padding:18px 22px 40px; }
+
+.reader-mode{ font-family:'Source Serif 4', serif; font-size:16px; line-height:1.7; color:var(--c-fg); }
+.reader-mode h1, .reader-mode h2, .reader-mode h3{ font-family:var(--ui-font); line-height:1.25; margin:1.1em 0 .5em; color:var(--c-fg); }
+.reader-mode p{ margin:0 0 1em; }
+.reader-mode img{ max-width:100%; height:auto; display:block; margin:1em auto; border:1px solid var(--c-border); }
+.reader-mode a{ color:var(--c-link); }
+.reader-mode blockquote{ margin:0 0 1em; padding-left:14px; border-left:3px solid var(--c-border); color:var(--c-fg-muted); font-style:italic; }
+.reader-mode figure{ margin:1em 0; }
+.reader-mode figcaption{ font-size:var(--fs-sm); color:var(--c-fg-muted); text-align:center; }
+.reader-mode ul, .reader-mode ol{ padding-left:1.4em; margin:0 0 1em; }
+.reader-loading, .reader-error{ padding:40px 14px; text-align:center; color:var(--c-fg-muted); font-family:var(--ui-font); font-size:var(--fs-md); }
+
+body.split-active #shell{ max-width:46vw; margin:0; padding-left:16px; padding-right:16px; }
+
+@media (max-width:899px){
+  .split-view{ width:100%; height:100%; }
+  body.split-active #shell{ display:none; }
+  .index-list{ column-count:1 !important; }
+}
+
+/* 4chan-x style hover-expand, flips side near a screen edge */
+.cursor-preview{
+  position:fixed;
+  z-index:480;
+  pointer-events:none;
+  background:var(--c-bg);
+  border:1px solid var(--c-border);
+  box-shadow:0 8px 26px rgba(0,0,0,.28);
+  padding:4px;
+  max-width:min(70vw, 560px);
+  max-height:min(80vh, 560px);
+}
+.cursor-preview.hidden{ display:none; }
+.cursor-preview img{
+  display:block;
+  max-width:100%;
+  max-height:min(76vh, 552px);
+  object-fit:contain;
+}
+
